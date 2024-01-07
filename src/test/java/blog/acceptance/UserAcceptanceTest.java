@@ -1,5 +1,6 @@
 package blog.acceptance;
 
+import blog.DatabaseCleaner;
 import blog.controller.dto.UserCreateRequest;
 import blog.controller.dto.error.ErrorResponse;
 import io.restassured.RestAssured;
@@ -8,6 +9,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
@@ -20,9 +22,13 @@ public class UserAcceptanceTest {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        databaseCleaner.execute();
     }
 
     @DisplayName("회원가입을 하면 상태코드 201과 회원 PK값을 응답한다.")

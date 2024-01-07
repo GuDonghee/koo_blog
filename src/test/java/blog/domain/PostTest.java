@@ -45,7 +45,6 @@ class PostTest {
     @ValueSource(strings = {"", " ", "##$제목", "제133목"})
     void create_invalidTitle(String invalidTitle) {
         // given
-        String title = "포스트 제목";
         String description = "포스트 내용";
 
         // when & then
