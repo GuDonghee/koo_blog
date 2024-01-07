@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import main.auth.controller.AuthenticationPrincipal;
 import main.blog.controller.dto.PostCreateRequest;
 import main.blog.service.PostService;
+import main.blog.service.dto.PostDetailResponse;
 import main.blog.service.dto.PostResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +38,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponse> findPost(@PathVariable Long postId) {
-        PostResponse response = this.postService.findPost(postId);
+    public ResponseEntity<PostDetailResponse> findPost(@PathVariable Long postId) {
+        PostDetailResponse response = this.postService.findPost(postId);
         return ResponseEntity.ok(response);
     }
 }
