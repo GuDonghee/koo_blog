@@ -1,21 +1,30 @@
 package blog.service;
 
+import blog.DatabaseCleaner;
 import blog.controller.dto.UserCreateRequest;
 import blog.exception.InvalidUserException;
-import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Transactional
 @SpringBootTest
 public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
+    @BeforeEach
+    void setUp() {
+        this.databaseCleaner.execute();
+    }
 
     @DisplayName("회원가입을 한다.")
     @Test
