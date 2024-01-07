@@ -9,3 +9,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  security:
+    jwt:
+      token:
+        secret-key: fsmjgbdafmjgbasmfgadbsgmadfhgbfamjghbvmssdgsdfgdf
+        expire-length: 3600000 #1시간

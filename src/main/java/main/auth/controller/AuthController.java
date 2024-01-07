@@ -2,12 +2,11 @@ package main.auth.controller;
 
 import main.auth.controller.dto.LoginRequest;
 import main.auth.service.AuthService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -19,9 +18,11 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping
-    public ResponseEntity<Void> signUp(@RequestBody @Valid LoginRequest request) {
-        this.authService.logIn(request);
-        return null;
+    @GetMapping
+    public ResponseEntity<Map<String, String>> signUp(@RequestBody LoginRequest request) {
+        String accessToken = this.authService.login(request);
+        Map<String, String> response = new HashMap<>();
+        response.put("token", accessToken);
+        return ResponseEntity.ok(response);
     }
 }
