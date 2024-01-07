@@ -1,8 +1,8 @@
 package main.blog.domain;
 
-import main.blog.exception.InvalidPostException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import main.blog.exception.InvalidPostException;
 
 import java.util.regex.Pattern;
 
@@ -28,14 +28,17 @@ public class Post {
     }
 
     public Post(String title, String description) {
-        validateTitle(title);
+        validate(title, description);
         this.title = title;
         this.description = description;
     }
 
-    private void validateTitle(String title) {
+    private void validate(String title, String description) {
         if (title == null || !TITLE_PATTERN.matcher(title).matches()) {
             throw new InvalidPostException("포스트 제목은 1 ~ 10 글자 사이의 한글 또는 영어만 입력해주세요.");
+        }
+        if (description == null || description.isEmpty()) {
+            throw new InvalidPostException("포스트 내용은 최소 한글자 이상 입력해주세요.");
         }
     }
 
