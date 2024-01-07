@@ -1,7 +1,7 @@
 package main.blog.repository;
 
-import main.auth.exception.NotFoundUserException;
 import main.blog.domain.User;
+import main.blog.exception.NotFoundUserException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {

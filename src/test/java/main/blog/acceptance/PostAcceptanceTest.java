@@ -67,7 +67,7 @@ public class PostAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header("Authorization", "Bearer " + accessToken)
                 .body(request)
-                .when().post("/post")
+                .when().post("/posts")
                 .then().log().all()
                 .extract();
 
@@ -84,7 +84,7 @@ public class PostAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header("Authorization", "Bearer " + accessToken)
                 .body(firstRequest)
-                .when().post("/post")
+                .when().post("/posts")
                 .then().log().all();
 
         PostCreateRequest secondRequest = new PostCreateRequest("두번째임다", "포스트 내용");
@@ -92,7 +92,7 @@ public class PostAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header("Authorization", "Bearer " + accessToken)
                 .body(secondRequest)
-                .when().post("/post")
+                .when().post("/posts")
                 .then().log().all();
 
         PostCreateRequest thirdRequest = new PostCreateRequest("세번째임다", "포스트 내용");
@@ -100,13 +100,13 @@ public class PostAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .header("Authorization", "Bearer " + accessToken)
                 .body(thirdRequest)
-                .when().post("/post")
+                .when().post("/posts")
                 .then().log().all();
 
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/post")
+                .when().get("/posts")
                 .then().log().all()
                 .extract();
         List<PostResponse> actual = response.as(List.class);
@@ -114,5 +114,30 @@ public class PostAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(actual).hasSize(3);
+    }
+
+    @DisplayName("포스트를 상세 조회하면 상태코드 200과 포스트 정보를 응답한다.")
+    @Test
+    void findPost() {
+        // given
+        PostCreateRequest firstRequest = new PostCreateRequest("첫번째임다", "포스트 내용");
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(firstRequest)
+                .when().post("/posts")
+                .then().log().all();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/posts/1" )
+                .then().log().all()
+                .extract();
+        PostResponse actual = response.as(PostResponse.class);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(actual.getId()).isEqualTo(1);
     }
 }

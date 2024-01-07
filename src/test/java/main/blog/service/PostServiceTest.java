@@ -2,9 +2,10 @@ package main.blog.service;
 
 import jakarta.transaction.Transactional;
 import main.DatabaseCleaner;
-import main.auth.exception.NotFoundUserException;
+import main.blog.exception.NotFoundUserException;
 import main.blog.controller.dto.PostCreateRequest;
 import main.blog.domain.User;
+import main.blog.exception.NotFoundPostException;
 import main.blog.repository.UserRepository;
 import main.blog.service.dto.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,5 +86,40 @@ public class PostServiceTest {
 
         // then
         assertThat(posts).hasSize(3);
+    }
+
+    @DisplayName("포스트를 상세 조회한다.")
+    @Test
+    void findPost() {
+        // given
+        User user = new User("데이빗", "koo@koo.com", "test1234%#");
+        User savedUser = this.userRepository.save(user);
+
+        PostCreateRequest firstRequest = new PostCreateRequest("첫번째임다", "포스트 내용");
+        postService.create(firstRequest, savedUser.getId());
+
+        PostCreateRequest secondRequest = new PostCreateRequest("두번째임다", "포스트 내용");
+        postService.create(secondRequest, savedUser.getId());
+
+        PostCreateRequest thirdRequest = new PostCreateRequest("세번째임다", "포스트 내용");
+        postService.create(thirdRequest, savedUser.getId());
+
+        // when
+        PostResponse post = this.postService.findPost(1L);
+
+        // then
+        assertThat(post.getId()).isEqualTo(1);
+    }
+
+    @DisplayName("포스트를 상세 조회 할 때, 일치하는 포스트가 없으면 예외가 발생한다.")
+    @Test
+    void findPost_not_found() {
+        // given
+        Long invalidPostId = 1L;
+
+        // when & then
+        assertThatThrownBy(() -> this.postService.findPost(invalidPostId))
+                .isInstanceOf(NotFoundPostException.class)
+                .hasMessage(String.format("ID: %d 와 일치하는 포스트가 없습니다.", invalidPostId));
     }
 }

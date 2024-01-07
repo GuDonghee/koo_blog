@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
@@ -34,5 +34,11 @@ public class PostController {
     public ResponseEntity<List<PostResponse>> findPosts() {
         List<PostResponse> responses = this.postService.findPosts();
         return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponse> findPost(@PathVariable Long postId) {
+        PostResponse response = this.postService.findPost(postId);
+        return ResponseEntity.ok(response);
     }
 }

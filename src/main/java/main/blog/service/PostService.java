@@ -36,4 +36,9 @@ public class PostService {
                 .map(post -> new PostResponse(post.getId(), post.getTitle(), post.getDescription()))
                 .toList();
     }
+
+    public PostResponse findPost(Long postId) {
+        Post post = this.postRepository.getById(postId);
+        return new PostResponse(post.getId(), post.getTitle(), post.getDescription());
+    }
 }
