@@ -2,6 +2,7 @@ package main.blog.controller.dto;
 
 import main.blog.domain.Post;
 import jakarta.validation.constraints.NotNull;
+import main.blog.domain.User;
 
 public class PostCreateRequest {
 
@@ -19,8 +20,8 @@ public class PostCreateRequest {
         this.description = description;
     }
 
-    public Post toEntity() {
-        return new Post(title, description);
+    public Post toEntity(User user) {
+        return new Post(title, description, user);
     }
 
     public String getTitle() {

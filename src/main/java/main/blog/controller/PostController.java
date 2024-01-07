@@ -27,7 +27,7 @@ public class PostController {
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid PostCreateRequest request
     ) {
-        Long postId = this.postService.create(request);
+        Long postId = this.postService.create(request, userId);
         return ResponseEntity.created(URI.create("/post/" + postId)).build();
     }
 }

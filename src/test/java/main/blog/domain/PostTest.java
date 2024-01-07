@@ -12,6 +12,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PostTest {
 
+    private User dummyUser = null;
+
     @DisplayName("Post를 생성한다.")
     @Test
     void create() {
@@ -20,7 +22,7 @@ class PostTest {
         String description = "포스트 내용";
 
         // when
-        Post actual = new Post(title, description);
+        Post actual = new Post(title, description, dummyUser);
 
         // then
         assertThat(actual.getTitle()).isEqualTo("포스트 제목");
@@ -35,7 +37,7 @@ class PostTest {
         String description = "포스트 내용";
 
         // when & then
-        assertThatThrownBy(() -> new Post(invalidTitle, description))
+        assertThatThrownBy(() -> new Post(invalidTitle, description, dummyUser))
                 .isInstanceOf(InvalidPostException.class)
                 .hasMessage("포스트 제목은 1 ~ 10 글자 사이의 한글 또는 영어만 입력해주세요.");
     }
@@ -49,7 +51,7 @@ class PostTest {
         String description = "포스트 내용";
 
         // when & then
-        assertThatThrownBy(() -> new Post(invalidTitle, description))
+        assertThatThrownBy(() -> new Post(invalidTitle, description, dummyUser))
                 .isInstanceOf(InvalidPostException.class)
                 .hasMessage("포스트 제목은 1 ~ 10 글자 사이의 한글 또는 영어만 입력해주세요.");
     }

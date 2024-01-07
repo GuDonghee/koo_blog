@@ -24,13 +24,18 @@ public class Post {
     @Column(nullable = false)
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "users_id", nullable = false)
+    private User user;
+
     protected Post() {
     }
 
-    public Post(String title, String description) {
+    public Post(String title, String description, User user) {
         validate(title, description);
         this.title = title;
         this.description = description;
+        this.user = user;
     }
 
     private void validate(String title, String description) {
