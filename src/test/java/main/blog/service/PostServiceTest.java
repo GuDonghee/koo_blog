@@ -6,11 +6,14 @@ import main.auth.exception.NotFoundUserException;
 import main.blog.controller.dto.PostCreateRequest;
 import main.blog.domain.User;
 import main.blog.repository.UserRepository;
+import main.blog.service.dto.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -59,5 +62,28 @@ public class PostServiceTest {
         assertThatThrownBy(() -> this.postService.create(request, invalidUserId))
                 .isInstanceOf(NotFoundUserException.class)
                 .hasMessage(String.format("ID: %d와 일치하는 회원이 없습니다.", invalidUserId));
+    }
+
+    @DisplayName("전체 포스트 목록을 조회한다.")
+    @Test
+    void findPosts() {
+        // given
+        User user = new User("데이빗", "koo@koo.com", "test1234%#");
+        User savedUser = this.userRepository.save(user);
+
+        PostCreateRequest firstRequest = new PostCreateRequest("첫번째임다", "포스트 내용");
+        postService.create(firstRequest, savedUser.getId());
+
+        PostCreateRequest secondRequest = new PostCreateRequest("두번째임다", "포스트 내용");
+        postService.create(secondRequest, savedUser.getId());
+
+        PostCreateRequest thirdRequest = new PostCreateRequest("세번째임다", "포스트 내용");
+        postService.create(thirdRequest, savedUser.getId());
+
+        // when
+        List<PostResponse> posts = this.postService.findPosts();
+
+        // then
+        assertThat(posts).hasSize(3);
     }
 }

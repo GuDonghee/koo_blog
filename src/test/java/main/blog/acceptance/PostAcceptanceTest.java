@@ -7,6 +7,8 @@ import main.DatabaseCleaner;
 import main.auth.controller.dto.LoginRequest;
 import main.blog.controller.dto.PostCreateRequest;
 import main.blog.controller.dto.UserCreateRequest;
+import main.blog.domain.User;
+import main.blog.service.dto.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,5 +73,46 @@ public class PostAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(201);
+    }
+
+    @DisplayName("전체 포스트 목록을 조회하면 상태코드 200과 포스트 목록을 응답한다.")
+    @Test
+    void findPosts() {
+        // given
+        PostCreateRequest firstRequest = new PostCreateRequest("첫번째임다", "포스트 내용");
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(firstRequest)
+                .when().post("/post")
+                .then().log().all();
+
+        PostCreateRequest secondRequest = new PostCreateRequest("두번째임다", "포스트 내용");
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(secondRequest)
+                .when().post("/post")
+                .then().log().all();
+
+        PostCreateRequest thirdRequest = new PostCreateRequest("세번째임다", "포스트 내용");
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(thirdRequest)
+                .when().post("/post")
+                .then().log().all();
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/post")
+                .then().log().all()
+                .extract();
+        List<PostResponse> actual = response.as(List.class);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(actual).hasSize(3);
     }
 }

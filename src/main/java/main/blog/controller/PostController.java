@@ -4,13 +4,12 @@ import jakarta.validation.Valid;
 import main.auth.controller.AuthenticationPrincipal;
 import main.blog.controller.dto.PostCreateRequest;
 import main.blog.service.PostService;
+import main.blog.service.dto.PostResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/post")
@@ -29,5 +28,11 @@ public class PostController {
     ) {
         Long postId = this.postService.create(request, userId);
         return ResponseEntity.created(URI.create("/post/" + postId)).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PostResponse>> findPosts() {
+        List<PostResponse> responses = this.postService.findPosts();
+        return ResponseEntity.ok(responses);
     }
 }
