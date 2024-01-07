@@ -52,5 +52,20 @@ class UserTest {
         assertThatThrownBy(() -> new User(name, invalidEmail, password))
                 .isInstanceOf(InvalidUserException.class)
                 .hasMessage("사용자 이메일은 이메일 형식으로 입력해주세요.");
+
+    }
+
+    @DisplayName("User를 생성 할 때, password가 6~15자 사이의 영어,숫자,특수기호 조합이 아니면 예외가 발생한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "koo1!", "koo@12koo@12koo!", "koo213$@ #$"})
+    void createUser_invalidPassword(String invalidPassword) {
+        // given
+        String name = "데이빗";
+        String email = "koo@koo.com";
+
+        // when  & then
+        assertThatThrownBy(() -> new User(name, email, invalidPassword))
+                .isInstanceOf(InvalidUserException.class)
+                .hasMessage("사용자 비밀번호는 6 ~ 15자 사이의 영어,숫자,특수기호 조합으로 입력해주세요.");
     }
 }

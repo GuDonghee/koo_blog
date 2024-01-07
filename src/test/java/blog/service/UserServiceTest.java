@@ -78,4 +78,17 @@ public class UserServiceTest {
                 .isInstanceOf(DuplicateUserException.class)
                 .hasMessage("이미 저장된 이메일입니다.");
     }
+
+    @DisplayName("회원가입을 할 때, 비밀번호가 6~15자 사이의 영어,숫자,특수기호 조합이 아니면 예외가 발생한다.")
+    @Test
+    void signUp_invalidPassword() {
+        // given
+        String invalidPassword = null;
+        UserCreateRequest request = new UserCreateRequest("데이빗", "koo@koo.com", invalidPassword);
+
+        // when  & then
+        assertThatThrownBy(() -> this.userService.signUp(request))
+                .isInstanceOf(InvalidUserException.class)
+                .hasMessage("사용자 비밀번호는 6 ~ 15자 사이의 영어,숫자,특수기호 조합으로 입력해주세요.");
+    }
 }

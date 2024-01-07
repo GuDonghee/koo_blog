@@ -117,4 +117,25 @@ public class UserAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(400);
         assertThat(actual.getMessage()).isEqualTo("이미 저장된 이메일입니다.");
     }
+
+    @DisplayName("회원가입을 할 때, 비밀번호가 6~15글자 사이의 영어, 숫자, 기호 조합이 아니면 상태코드 400과 에러메세지를 응답한다.")
+    @Test
+    void signUp_invalidPassword() {
+        // given
+        String invalidPassword = "";
+        UserCreateRequest request = new UserCreateRequest("데이빗", "koo@koo.com", invalidPassword);
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/users")
+                .then().log().all()
+                .extract();
+        ErrorResponse actual = response.as(ErrorResponse.class);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(400);
+        assertThat(actual.getMessage()).isEqualTo("올바른 비밀번호 형식이 아닙니다.");
+    }
 }

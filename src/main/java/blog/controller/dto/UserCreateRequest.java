@@ -16,7 +16,8 @@ public class UserCreateRequest {
     @Email(message = "이메일 형식이 아닙니다.")
     private String email;
 
-    @NotNull
+    @NotBlank(message = "올바른 비밀번호 형식이 아닙니다.")
+    @Size(min = 6, max = 15, message = "올바른 비밀번호 형식이 아닙니다.")
     private String password;
 
     private UserCreateRequest() {
