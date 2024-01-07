@@ -1,9 +1,8 @@
 package main.blog.controller;
 
 import main.blog.controller.dto.error.ErrorResponse;
-import main.blog.exception.DuplicateUserException;
-import main.blog.exception.InvalidPostException;
-import main.blog.exception.InvalidUserException;
+import main.blog.exception.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,11 +15,21 @@ public class ControllerAdvice {
     @ExceptionHandler({
             InvalidPostException.class,
             InvalidUserException.class,
+            InvalidCommentException.class,
             DuplicateUserException.class
     })
     public ResponseEntity<ErrorResponse> handleInvalidData(final RuntimeException e) {
         ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler({
+            NotFoundUserException.class,
+            NotFoundPostException.class
+    })
+    public ResponseEntity<ErrorResponse> handleNotFoundData(final RuntimeException e) {
+        ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler({
