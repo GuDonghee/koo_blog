@@ -1,8 +1,9 @@
 package main.blog.controller;
 
-import main.blog.service.PostService;
-import main.blog.controller.dto.PostCreateRequest;
 import jakarta.validation.Valid;
+import main.auth.controller.AuthenticationPrincipal;
+import main.blog.controller.dto.PostCreateRequest;
+import main.blog.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,10 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid PostCreateRequest request) {
+    public ResponseEntity<Void> create(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody @Valid PostCreateRequest request
+    ) {
         Long postId = this.postService.create(request);
         return ResponseEntity.created(URI.create("/post/" + postId)).build();
     }
