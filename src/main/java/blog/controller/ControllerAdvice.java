@@ -1,6 +1,7 @@
 package blog.controller;
 
 import blog.controller.dto.error.ErrorResponse;
+import blog.exception.DuplicateUserException;
 import blog.exception.InvalidPostException;
 import blog.exception.InvalidUserException;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,8 @@ public class ControllerAdvice {
 
     @ExceptionHandler({
             InvalidPostException.class,
-            InvalidUserException.class
+            InvalidUserException.class,
+            DuplicateUserException.class
     })
     public ResponseEntity<ErrorResponse> handleInvalidData(final RuntimeException e) {
         ErrorResponse errorResponse = new ErrorResponse(e.getMessage());

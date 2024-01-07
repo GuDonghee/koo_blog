@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 public class User {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("^[a-zA-Zㄱ-ㅎ가-힣]{1,10}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,15 +33,18 @@ public class User {
     }
 
     public User(String name, String email, String password) {
-        validate(name);
+        validate(name, email);
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    private void validate(String name) {
+    private void validate(String name, String email) {
         if (name == null || !NAME_PATTERN.matcher(name).matches()) {
             throw new InvalidUserException("사용자 닉네임은 1 ~ 10 글자 사이의 한글 또는 영어만 입력해주세요.");
+        }
+        if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
+            throw new InvalidUserException("사용자 이메일은 이메일 형식으로 입력해주세요.");
         }
     }
 
