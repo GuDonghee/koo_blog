@@ -1,7 +1,7 @@
 package blog.acceptance;
 
-import blog.controller.dto.PostCreateRequest;
 import blog.controller.dto.UserCreateRequest;
+import blog.controller.dto.error.ErrorResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -42,5 +42,26 @@ public class UserAcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(201);
         assertThat(response.header("location")).isEqualTo("/users/1");
+    }
+
+    @DisplayName("회원가입을 할 때, 닉네임이 1~10자 사이의 한글또는 영어가 아니면 상태코드 400과 에러메세지를 응답한다.")
+    @Test
+    void signUp_invalidName() {
+        // given
+        String invalidName = " ";
+        UserCreateRequest request = new UserCreateRequest(invalidName, "koo@koo.com", "test1234!@");
+
+        // when
+        ExtractableResponse<Response> response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/users")
+                .then().log().all()
+                .extract();
+        ErrorResponse actual = response.as(ErrorResponse.class);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(400);
+        assertThat(actual.getMessage()).isEqualTo("사용자 닉네임은 1 ~ 10 글자 사이의 한글 또는 영어만 입력해주세요.");
     }
 }
