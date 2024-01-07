@@ -5,9 +5,10 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import main.DatabaseCleaner;
 import main.auth.controller.dto.LoginRequest;
+import main.blog.controller.dto.CommentCreateRequest;
 import main.blog.controller.dto.PostCreateRequest;
 import main.blog.controller.dto.UserCreateRequest;
-import main.blog.domain.User;
+import main.blog.service.dto.PostDetailResponse;
 import main.blog.service.dto.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -128,13 +129,30 @@ public class PostAcceptanceTest {
                 .when().post("/posts")
                 .then().log().all();
 
+        CommentCreateRequest first = new CommentCreateRequest(1L, "코멘트 내용");
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(first)
+                .when().post("/comments")
+                .then().log().all();
+
+        CommentCreateRequest second = new CommentCreateRequest(1L, "두번째 코멘트 내용");
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(second)
+                .when().post("/comments")
+                .then().log().all()
+                .extract();
+
         // when
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/posts/1" )
+                .when().get("/posts/1")
                 .then().log().all()
                 .extract();
-        PostResponse actual = response.as(PostResponse.class);
+        PostDetailResponse actual = response.as(PostDetailResponse.class);
 
         // then
         assertThat(response.statusCode()).isEqualTo(200);

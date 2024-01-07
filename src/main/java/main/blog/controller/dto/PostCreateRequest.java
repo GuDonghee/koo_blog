@@ -1,8 +1,10 @@
 package main.blog.controller.dto;
 
-import main.blog.domain.Post;
 import jakarta.validation.constraints.NotNull;
+import main.blog.domain.Post;
 import main.blog.domain.User;
+
+import java.util.ArrayList;
 
 public class PostCreateRequest {
 

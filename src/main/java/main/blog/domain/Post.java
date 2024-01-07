@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import main.blog.exception.InvalidPostException;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Entity
@@ -25,8 +26,11 @@ public class Post {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private List<Comment> comments;
 
     protected Post() {
     }
@@ -57,5 +61,13 @@ public class Post {
 
     public String getDescription() {
         return description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
     }
 }

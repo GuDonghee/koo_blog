@@ -6,11 +6,13 @@ import main.blog.domain.Post;
 import main.blog.domain.User;
 import main.blog.repository.PostRepository;
 import main.blog.repository.UserRepository;
+import main.blog.service.dto.PostDetailResponse;
 import main.blog.service.dto.PostResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Transactional
 @Service
 public class PostService {
 
@@ -22,7 +24,6 @@ public class PostService {
         this.userRepository = userRepository;
     }
 
-    @Transactional
     public Long create(PostCreateRequest request, Long userId) {
         User user = this.userRepository.getById(userId);
         Post post = request.toEntity(user);
@@ -37,8 +38,8 @@ public class PostService {
                 .toList();
     }
 
-    public PostResponse findPost(Long postId) {
+    public PostDetailResponse findPost(Long postId) {
         Post post = this.postRepository.getById(postId);
-        return new PostResponse(post.getId(), post.getTitle(), post.getDescription());
+        return new PostDetailResponse(post);
     }
 }

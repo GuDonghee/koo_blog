@@ -1,12 +1,16 @@
 package main.blog.service;
 
-import jakarta.transaction.Transactional;
 import main.DatabaseCleaner;
-import main.blog.exception.NotFoundUserException;
 import main.blog.controller.dto.PostCreateRequest;
+import main.blog.domain.Comment;
+import main.blog.domain.Post;
 import main.blog.domain.User;
 import main.blog.exception.NotFoundPostException;
+import main.blog.exception.NotFoundUserException;
+import main.blog.repository.CommentRepository;
+import main.blog.repository.PostRepository;
 import main.blog.repository.UserRepository;
+import main.blog.service.dto.PostDetailResponse;
 import main.blog.service.dto.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +30,13 @@ public class PostServiceTest {
     private PostService postService;
 
     @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -95,19 +105,29 @@ public class PostServiceTest {
         User savedUser = this.userRepository.save(user);
 
         PostCreateRequest firstRequest = new PostCreateRequest("첫번째임다", "포스트 내용");
-        postService.create(firstRequest, savedUser.getId());
+        Long postId = postService.create(firstRequest, savedUser.getId());
+        Post post = this.postRepository.findById(postId).get();
 
-        PostCreateRequest secondRequest = new PostCreateRequest("두번째임다", "포스트 내용");
-        postService.create(secondRequest, savedUser.getId());
+        Comment first = new Comment("첫번째", savedUser, post);
+        Comment save = this.commentRepository.save(first);
 
-        PostCreateRequest thirdRequest = new PostCreateRequest("세번째임다", "포스트 내용");
-        postService.create(thirdRequest, savedUser.getId());
+        Comment second = new Comment("두번째", savedUser, post);
+        this.commentRepository.save(second);
+
+        Comment third = new Comment("세번째", savedUser, post);
+        this.commentRepository.save(third);
 
         // when
-        PostResponse post = this.postService.findPost(1L);
+        PostDetailResponse actual = this.postService.findPost(1L);
 
         // then
-        assertThat(post.getId()).isEqualTo(1);
+        assertThat(actual.getId()).isEqualTo(1);
+
+        assertThat(actual.getComments()).hasSize(3);
+
+        assertThat(actual.getComments().get(0).getId()).isEqualTo(1);
+        assertThat(actual.getComments().get(1).getId()).isEqualTo(2);
+        assertThat(actual.getComments().get(2).getId()).isEqualTo(3);
     }
 
     @DisplayName("포스트를 상세 조회 할 때, 일치하는 포스트가 없으면 예외가 발생한다.")
