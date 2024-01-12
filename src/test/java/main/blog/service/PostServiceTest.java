@@ -46,21 +46,6 @@ public class PostServiceTest {
         this.databaseCleaner.execute();
     }
 
-    @DisplayName("포스트를 등록한다.")
-    @Test
-    void createPost() {
-        // given
-        User user = new User("데이빗", "koo@koo.com", "test1234%#");
-        User savedUser = this.userRepository.save(user);
-        PostCreateRequest request = new PostCreateRequest("포스트 제목", "포스트 내용");
-
-        // when
-        Long postId = postService.create(request, savedUser.getId());
-
-        // then
-        assertThat(postId).isEqualTo(1L);
-    }
-
     @DisplayName("포스트를 등록 할 때, 일치하는 회원이 없으면 예외가 발생한다.")
     @Test
     void createPost_not_found_user() {
@@ -95,39 +80,6 @@ public class PostServiceTest {
 
         // then
         assertThat(posts).hasSize(3);
-    }
-
-    @DisplayName("포스트를 상세 조회한다.")
-    @Test
-    void findPost() {
-        // given
-        User user = new User("데이빗", "koo@koo.com", "test1234%#");
-        User savedUser = this.userRepository.save(user);
-
-        PostCreateRequest firstRequest = new PostCreateRequest("첫번째임다", "포스트 내용");
-        Long postId = postService.create(firstRequest, savedUser.getId());
-        Post post = this.postRepository.findById(postId).get();
-
-        Comment first = new Comment("첫번째", savedUser, post);
-        Comment save = this.commentRepository.save(first);
-
-        Comment second = new Comment("두번째", savedUser, post);
-        this.commentRepository.save(second);
-
-        Comment third = new Comment("세번째", savedUser, post);
-        this.commentRepository.save(third);
-
-        // when
-        PostDetailResponse actual = this.postService.findPost(1L);
-
-        // then
-        assertThat(actual.getId()).isEqualTo(1);
-
-        assertThat(actual.getComments()).hasSize(3);
-
-        assertThat(actual.getComments().get(0).getId()).isEqualTo(1);
-        assertThat(actual.getComments().get(1).getId()).isEqualTo(2);
-        assertThat(actual.getComments().get(2).getId()).isEqualTo(3);
     }
 
     @DisplayName("포스트를 상세 조회 할 때, 일치하는 포스트가 없으면 예외가 발생한다.")

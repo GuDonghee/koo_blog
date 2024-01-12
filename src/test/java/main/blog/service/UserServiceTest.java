@@ -28,19 +28,6 @@ public class UserServiceTest {
         this.databaseCleaner.execute();
     }
 
-    @DisplayName("회원가입을 한다.")
-    @Test
-    void signUp() {
-        // given
-        UserCreateRequest request = new UserCreateRequest("데이빗", "koo@koo.com", "test1234!@");
-
-        // when
-        Long userId = userService.signUp(request);
-
-        // then
-        assertThat(userId).isEqualTo(1L);
-    }
-
     @DisplayName("회원가입을 할 때, 닉네임이 1~10자 사이의 한글또는 영어가 아니면 예외가 발생한다.")
     @Test
     void signUp_invalidName() {

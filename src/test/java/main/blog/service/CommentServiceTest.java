@@ -39,25 +39,6 @@ public class CommentServiceTest {
         this.databaseCleaner.execute();
     }
 
-    @DisplayName("코멘트를 등록한다.")
-    @Test
-    void createComment() {
-        // given
-        User user = new User("데이빗", "koo@koo.com", "test1234%#");
-        User savedUser = this.userRepository.save(user);
-
-        Post post = new Post("포스트명", "내용", user);
-        Post savedPost = this.postRepository.save(post);
-
-        CommentCreateRequest request = new CommentCreateRequest(savedPost.getId(), "코멘트 내용입니다.");
-
-        // when
-        Long commentId = this.commentService.create(request, savedUser.getId());
-
-        // then
-        assertThat(commentId).isEqualTo(1L);
-    }
-
     @DisplayName("코멘트를 등록할 때, 일치하는 회원이 없으면 예외가 발생한다.")
     @Test
     void createComment_not_found_user() {

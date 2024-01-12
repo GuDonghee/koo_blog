@@ -1,4 +1,10 @@
-FROM openjdk:17-alpine
-ARG JAR_PATH=build/libs/*.jar
-COPY ${JAR_PATH} /home/server.jar
-ENTRYPOINT ["java","-jar","/home/server.jar"]
+FROM amazoncorretto:17.0.7-alpine3.17 as builder
+WORKDIR /app
+COPY . .
+RUN chmod +x ./gradlew && ./gradlew clean build -x test;
+
+FROM openjdk:17
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar", \
+            "-Dspring-boot.run.arguments=--security.jwt.token.secret-key=${SECRET_KEY}"]

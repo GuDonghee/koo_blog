@@ -1,5 +1,9 @@
-# 🚀 블로그 API 서버 튜토리얼
+# 🚀 쿠블로그 Application 서버 
 간단한 블로그 API 서버 개발 및 인프라 배포 연습을 위한 튜토리얼 저장소입니다. 
+
+
+</br>
+</br>
 
 ## 블로그 ERD
 
@@ -20,15 +24,29 @@
     user_id integer
     }
     
+    Table comments {
+    id integer [primary key]
+    description text [not null]
+    user_id integer
+    post_id integer
+    }
     
     Ref: users.id < posts.user_id 
+    Ref: users.id < comments.user_id 
+    Ref: posts.id < comments.post_id 
 </details>
 
 - Sudo코드 ERD 추출을 위한 사이트: https://dbdiagram.io/d
 
 ### ERD
-![스크린샷 2024-01-07 오후 12.51.54.png](..%2F..%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-01-07%20%EC%98%A4%ED%9B%84%2012.51.54.png)
+<img width="756" alt="스크린샷 2024-10-08 오후 8 52 26" src="https://github.com/user-attachments/assets/35af65f3-4630-40c0-acba-41750ecdfbc5">
 
+
+
+
+
+</br>
+</br>
 
 ## 기능 요구사항
 
@@ -60,4 +78,7 @@
   - [x] 등록하려는 포스트가 있어야 함
   - [x] 내용(description)은 최소 한글자 이상(공백 가능)
 
+
+</br>
+</br>
 

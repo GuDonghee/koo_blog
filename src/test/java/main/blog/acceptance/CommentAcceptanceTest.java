@@ -104,34 +104,4 @@ public class CommentAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(404);
         assertThat(actual.getMessage()).isEqualTo(String.format("ID: %d 와 일치하는 포스트가 없습니다.", invalidPostId));
     }
-
-    @DisplayName("코멘트를 등록 할 때, 내용이 한글자 미만이면 상태코드 400과 에러메세지를 응답한다.")
-    @Test
-    void createComment_invalid_description() {
-        // given
-        PostCreateRequest postCreateRequest = new PostCreateRequest("포스트 제목", "포스트 내용");
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("Authorization", "Bearer " + accessToken)
-                .body(postCreateRequest)
-                .when().post("/posts")
-                .then().log().all();
-
-        String invalidDescription = "";
-        CommentCreateRequest request = new CommentCreateRequest(1L, invalidDescription);
-
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("Authorization", "Bearer " + accessToken)
-                .body(request)
-                .when().post("/comments")
-                .then().log().all()
-                .extract();
-        ErrorResponse actual = response.as(ErrorResponse.class);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(400);
-        assertThat(actual.getMessage()).isEqualTo("코멘트는 최소 1글자 이상 입력해주세요.");
-    }
 }

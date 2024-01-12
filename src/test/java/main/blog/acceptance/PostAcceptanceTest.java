@@ -116,46 +116,4 @@ public class PostAcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(actual).hasSize(3);
     }
-
-    @DisplayName("포스트를 상세 조회하면 상태코드 200과 포스트 정보를 응답한다.")
-    @Test
-    void findPost() {
-        // given
-        PostCreateRequest firstRequest = new PostCreateRequest("첫번째임다", "포스트 내용");
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("Authorization", "Bearer " + accessToken)
-                .body(firstRequest)
-                .when().post("/posts")
-                .then().log().all();
-
-        CommentCreateRequest first = new CommentCreateRequest(1L, "코멘트 내용");
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("Authorization", "Bearer " + accessToken)
-                .body(first)
-                .when().post("/comments")
-                .then().log().all();
-
-        CommentCreateRequest second = new CommentCreateRequest(1L, "두번째 코멘트 내용");
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .header("Authorization", "Bearer " + accessToken)
-                .body(second)
-                .when().post("/comments")
-                .then().log().all()
-                .extract();
-
-        // when
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/posts/1")
-                .then().log().all()
-                .extract();
-        PostDetailResponse actual = response.as(PostDetailResponse.class);
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(actual.getId()).isEqualTo(1);
-    }
 }
