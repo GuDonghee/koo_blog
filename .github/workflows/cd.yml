@@ -41,16 +41,16 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           script: |
             sudo docker ps
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/koo-blog
             sudo docker stop koo
             sudo docker rm koo
             sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/koo-blog:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/koo-blog
             sudo docker run -d \
               -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
               -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
               -p 8080:8080 \
-              --name koo 
+              --name koo \
               ${{ secrets.DOCKER_USERNAME }}/koo-blog
             sudo docker image prune -f
