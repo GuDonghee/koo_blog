@@ -79,4 +79,7 @@
 
 기능을 확장하면서 시나리오를 변경하고 인프라를 확장할 예정입니다.
 
-<img width="1297" alt="스크린샷 2024-01-12 오후 8 24 52" src="https://github.com/GuDonghee/Practice_Blog/assets/155864800/16020abb-578d-4e17-bc46-2028d8259f00">
+<img width="1320" alt="스크린샷 2024-01-16 오후 11 46 10" src="https://github.com/GuDonghee/Practice_Blog/assets/155864800/153188e4-5941-4cea-a848-21a3fa8959fb">
+
+
+
