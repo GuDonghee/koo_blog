@@ -20,4 +20,5 @@ spring:
         secret-key: ${SECRET_KEY}
         expire-length: 3600000 #1시간
 
-
+server:
+  port: 8081

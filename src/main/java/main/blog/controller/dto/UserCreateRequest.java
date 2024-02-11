@@ -19,7 +19,7 @@ public class UserCreateRequest {
     @Size(min = 6, max = 15, message = "올바른 비밀번호 형식이 아닙니다.")
     private String password;
 
-    private UserCreateRequest() {
+    public UserCreateRequest() {
     }
 
     public UserCreateRequest(String name, String email, String password) {

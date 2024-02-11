@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,59 +31,49 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/koo-blog
 
       - name: Deploy First Application to EC2
-        uses: appleboy/ssh-action@master
         id: deploy
-        with:
-          host: ${{ secrets.BASTION_HOST }}
-          username: ${{ secrets.BASTION_USERNAME }}
-          port: 22
-          key: ${{ secrets.SERVER_PRIVATE_KEY }}
-          script: |
-            ssh \
-            -o StrictHostKeyChecking=no -i /home/ec2-user/koo-blog-key.pem \ 
-            ${{ secrets.FIRST_SERVER_USERNAME }}@${{ secrets.FIRST_SERVER_HOST }} \ 
-            '
-            sudo docker ps; \
-            sudo docker stop koo; \
-            sudo docker rm koo; \
-            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/koo-blog:latest; \
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/koo-blog; \
-            sudo docker run -d \
-              -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
-              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-              -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
-              -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
-              -p 8080:8080 \
-              --name koo \
-              ${{ secrets.DOCKER_USERNAME }}/koo-blog; \
-            sudo docker image prune -f;
-            '
-
-      - name: Deploy Second Application to EC2
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
         uses: appleboy/ssh-action@master
-        id: deploy2
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USERNAME }}
           port: 22
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          envs: DOCKER_USERNAME,SECRET_KEY,DATABASE_URL,DATABASE_USERNAME,DATABASE_PASSWORD
           script: |
-            ssh \
-            -o StrictHostKeyChecking=no -i /home/ec2-user/koo-blog-key.pem \
-            ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} \
-            '
-            sudo docker ps; \ 
-            sudo docker stop koo; \
-            sudo docker rm koo; \
-            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/koo-blog:latest; \
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/koo-blog; \
-            sudo docker run -d \
-              -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
-              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-              -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
-              -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
-              -p 8080:8080 \
-              --name koo \
-              ${{ secrets.DOCKER_USERNAME }}/koo-blog; \
-            sudo docker image prune -f;
-            '
+            ssh -i koo-blog-key.pem ${{ secrets.FIRST_SERVER_USERNAME }}@${{ secrets.FIRST_SERVER_HOST }} \
+            DOCKER_USERNAME=$DOCKER_USERNAME \
+            SECRET_KEY=$SECRET_KEY \
+            DATABASE_URL=$DATABASE_URL \
+            DATABASE_USERNAME=$DATABASE_USERNAME \
+            DATABASE_PASSWORD=$DATABASE_PASSWORD \
+            'bash -s' < deploy.sh \
+
+#      - name: Deploy Second Application to EC2
+#        id: deploy-second
+#        env:
+#          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+#          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+#          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+#          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.BASTION_HOST }}
+#          username: ${{ secrets.BASTION_USERNAME }}
+#          port: 22
+#          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+#          envs: DOCKER_USERNAME,SECRET_KEY,DATABASE_URL,DATABASE_USERNAME,DATABASE_PASSWORD
+#          script: |
+#            ssh -i koo-blog-key.pem ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} \
+#            DOCKER_USERNAME=$DOCKER_USERNAME \
+#            SECRET_KEY=$SECRET_KEY \
+#            DATABASE_URL=$DATABASE_URL \
+#            DATABASE_USERNAME=$DATABASE_USERNAME \
+#            DATABASE_PASSWORD=$DATABASE_PASSWORD \
+#            'bash -s' < deploy-second.sh \
