@@ -68,11 +68,11 @@ jobs:
           port: 22
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           script: |
-            ssh 
-            -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_PRIVATE_KEY }} 
-            -A -t ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} 
+            ssh \
+            -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_PRIVATE_KEY }} \ 
+            -A -t ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} \  
             "
-            sudo docker ps
+            sudo docker ps 
             sudo docker stop koo
             sudo docker rm koo
             sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/koo-blog:latest
