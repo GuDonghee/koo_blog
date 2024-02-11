@@ -40,7 +40,7 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           script: |
             ssh \
-            -tt -o StrictHostKeyChecking=no -i /home/ec2-user/koo-blog-key.pem \ 
+            -o StrictHostKeyChecking=no -i /home/ec2-user/koo-blog-key.pem \ 
             ${{ secrets.FIRST_SERVER_USERNAME }}@${{ secrets.FIRST_SERVER_HOST }} \ 
             '
             sudo docker ps; \
@@ -69,7 +69,7 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           script: |
             ssh \
-            -tt -o StrictHostKeyChecking=no -i /home/ec2-user/koo-blog-key.pem \
+            -o StrictHostKeyChecking=no -i /home/ec2-user/koo-blog-key.pem \
             ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} \
             '
             sudo docker ps; \ 
