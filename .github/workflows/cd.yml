@@ -30,15 +30,19 @@ jobs:
           docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/koo-blog .
           docker push ${{ secrets.DOCKER_USERNAME }}/koo-blog
 
-      - name: Deploy to EC2
+      - name: Deploy First Application to EC2
         uses: appleboy/ssh-action@master
         id: deploy
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.BASTION_USERNAME }}
           port: 22
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           script: |
+            ssh 
+            -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_PRIVATE_KEY }} 
+            -A -t ${{ secrets.FIRST_SERVER_USERNAME }}@${{ secrets.FIRST_SERVER_HOST }} 
+            "
             sudo docker ps
             sudo docker stop koo
             sudo docker rm koo
@@ -47,9 +51,39 @@ jobs:
             sudo docker run -d \
               -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-              -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \ 완
-              -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \ 완
+              -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
+              -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
               -p 8080:8080 \
               --name koo \
               ${{ secrets.DOCKER_USERNAME }}/koo-blog
             sudo docker image prune -f
+            "
+
+      - name: Deploy Second Application to EC2
+        uses: appleboy/ssh-action@master
+        id: deploy
+        with:
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.BASTION_USERNAME }}
+          port: 22
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          script: |
+            ssh 
+            -o StrictHostKeyChecking=no -i ${{ secrets.SERVER_PRIVATE_KEY }} 
+            -A -t ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} 
+            "
+            sudo docker ps
+            sudo docker stop koo
+            sudo docker rm koo
+            sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/koo-blog:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/koo-blog
+            sudo docker run -d \
+              -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
+              -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -p 8080:8080 \
+              --name koo \
+              ${{ secrets.DOCKER_USERNAME }}/koo-blog
+            sudo docker image prune -f
+            "
