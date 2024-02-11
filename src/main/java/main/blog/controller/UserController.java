@@ -18,9 +18,6 @@ import java.net.UnknownHostException;
 @RequestMapping("/users")
 public class UserController {
 
-    @Value("${server.port}")
-    private String port;
-
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -30,6 +27,6 @@ public class UserController {
     @PostMapping
     public ResponseEntity<Void> signUp(@RequestBody @Valid UserCreateRequest request) {
         Long userId = this.userService.signUp(request);
-        return ResponseEntity.created(URI.create("/users/" + userId + ":" + port)).build();
+        return ResponseEntity.created(URI.create("/users/" + userId)).build();
     }
 }

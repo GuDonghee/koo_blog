@@ -54,26 +54,26 @@ jobs:
             DATABASE_PASSWORD=$DATABASE_PASSWORD \
             'bash -s' < deploy.sh \
 
-#      - name: Deploy Second Application to EC2
-#        id: deploy-second
-#        env:
-#          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-#          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-#          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-#          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-#          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.BASTION_HOST }}
-#          username: ${{ secrets.BASTION_USERNAME }}
-#          port: 22
-#          key: ${{ secrets.SERVER_PRIVATE_KEY }}
-#          envs: DOCKER_USERNAME,SECRET_KEY,DATABASE_URL,DATABASE_USERNAME,DATABASE_PASSWORD
-#          script: |
-#            ssh -i koo-blog-key.pem ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} \
-#            DOCKER_USERNAME=$DOCKER_USERNAME \
-#            SECRET_KEY=$SECRET_KEY \
-#            DATABASE_URL=$DATABASE_URL \
-#            DATABASE_USERNAME=$DATABASE_USERNAME \
-#            DATABASE_PASSWORD=$DATABASE_PASSWORD \
-#            'bash -s' < deploy-second.sh \
+      - name: Deploy Second Application to EC2
+        id: deploy-second
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.BASTION_USERNAME }}
+          port: 22
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          envs: DOCKER_USERNAME,SECRET_KEY,DATABASE_URL,DATABASE_USERNAME,DATABASE_PASSWORD
+          script: |
+            ssh -i koo-blog-key.pem ${{ secrets.SECOND_SERVER_USERNAME }}@${{ secrets.SECOND_SERVER_HOST }} \
+            DOCKER_USERNAME=$DOCKER_USERNAME \
+            SECRET_KEY=$SECRET_KEY \
+            DATABASE_URL=$DATABASE_URL \
+            DATABASE_USERNAME=$DATABASE_USERNAME \
+            DATABASE_PASSWORD=$DATABASE_PASSWORD \
+            'bash -s' < deploy-second.sh \
