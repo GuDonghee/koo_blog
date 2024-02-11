@@ -61,7 +61,7 @@ jobs:
 
       - name: Deploy Second Application to EC2
         uses: appleboy/ssh-action@master
-        id: deploy
+        id: deploy2
         with:
           host: ${{ secrets.BASTION_HOST }}
           username: ${{ secrets.BASTION_USERNAME }}

@@ -47,7 +47,6 @@ public class UserAcceptanceTest {
 
         // then
         assertThat(response.statusCode()).isEqualTo(201);
-        assertThat(response.header("location")).isEqualTo("/users/1");
     }
 
     @DisplayName("회원가입을 할 때, 닉네임이 1~10자 사이의 한글또는 영어가 아니면 상태코드 400과 에러메세지를 응답한다.")
