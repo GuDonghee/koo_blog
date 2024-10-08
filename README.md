@@ -1,7 +1,6 @@
 # 🚀 쿠블로그 Application 서버 
 간단한 블로그 API 서버 개발 및 인프라 배포 연습을 위한 튜토리얼 저장소입니다. 
 
-해당 서비스의 전체 인프라는 Terraform을 통해 IAS로 관리하며 쿠블로그 Infra 저장소를 통해 관리합니다. ([인프라 저장소 보러가기](https://github.com/GuDonghee/koo_blog_infra)) 
 
 </br>
 </br>
@@ -25,14 +24,23 @@
     user_id integer
     }
     
+    Table comments {
+    id integer [primary key]
+    description text [not null]
+    user_id integer
+    post_id integer
+    }
     
     Ref: users.id < posts.user_id 
+    Ref: users.id < comments.user_id 
+    Ref: posts.id < comments.post_id 
 </details>
 
 - Sudo코드 ERD 추출을 위한 사이트: https://dbdiagram.io/d
 
 ### ERD
-<img width="625" alt="스크린샷 2024-01-12 오후 8 47 51" src="https://github.com/GuDonghee/Practice_Blog/assets/155864800/85ac7075-70aa-4811-825e-73df1ff1ec17">
+<img width="756" alt="스크린샷 2024-10-08 오후 8 52 26" src="https://github.com/user-attachments/assets/35af65f3-4630-40c0-acba-41750ecdfbc5">
+
 
 
 
