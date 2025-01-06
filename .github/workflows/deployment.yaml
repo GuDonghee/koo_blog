@@ -1,0 +1,62 @@
+name: Koo Blog Server Deploy
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check if the release is created from the main branch
+        run: |
+          echo "This release is created from main branch"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+
+      - name: Build and Push Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: koo-blog
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          docker build -t $REGISTRY/$IMAGE_NAME:$SHA_SHORT .
+          docker push $REGISTRY/$IMAGE_NAME:$SHA_SHORT
+
+  deploy-to-ec2:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add SSH Key
+      - uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.EC2_PEM_KEY }}
+
+      - name: Deploy to EC2
+        env:
+          REGISTRY: ${{ needs.build-and-push.steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: koo-blog
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP }}
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $REGISTRY
+          docker pull $REGISTRY/$IMAGE_NAME:$SHA_SHORT
+          docker stop koo-blog || true
+          docker rm koo-blog || true
+          docker run -d --name koo-blog -p 8080:8080 $REGISTRY/$IMAGE_NAME:$SHA_SHORT
