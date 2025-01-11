@@ -17,5 +17,5 @@ spring:
   security:
     jwt:
       token:
-        secret-key: ${SECRET_KEY}
+        secret-key: dsfasgfjknadsjkl32dsf
         expire-length: 3600000 #1시간

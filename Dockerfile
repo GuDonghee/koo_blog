@@ -6,5 +6,4 @@ RUN chmod +x ./gradlew && ./gradlew clean build -x test;
 FROM openjdk:17
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
-ENTRYPOINT ["java","-jar","app.jar", \
-            "-Dspring-boot.run.arguments=--security.jwt.token.secret-key=${SECRET_KEY}"]
+ENTRYPOINT ["java","-jar","app.jar"]

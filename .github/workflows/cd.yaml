@@ -1,0 +1,59 @@
+name: Koo Blog Server Deploy
+
+on:
+  push:
+    branches:
+      - chore/create-cd
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set Docker Image Tag
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "SHA_SHORT=$SHA_SHORT" >> $GITHUB_ENV 
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+
+      - name: Build and Push Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_NAME: koo-blog
+          SHA_SHORT: ${{ env.SHA_SHORT }}
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAME:$SHA_SHORT .
+          docker push $REGISTRY/$IMAGE_NAME:$SHA_SHORT
+
+      - name: Deploy to Server EC2
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.SERVER_PEM_KEY }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ec2-user
+          scirpt: |
+            sudo aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
+            sudo aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
+            sudo aws configure set region ap-northeast-2
+            sudo aws configure set output json
+  
+            sudo aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $REGISTRY
+            sudo docker stop koo-blog || true
+            sudo docker rm koo-blog || true
+            sudo docker images -q | xargs -r docker rmi
+            sudo docker pull $REGISTRY/$IMAGE_NAME:$SHA_SHORT
+            sudo docker run -d --name koo-blog -p 8080:8080 $REGISTRY/$IMAGE_NAME:$SHA_SHORT
