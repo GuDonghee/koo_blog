@@ -26,11 +26,38 @@ jobs:
           mask-password: "true"
 
       - name: Build and Push Container Image
+        id: build-image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          REPOSITORY: ${{ secrets.REPOSITORY }}
         run: |
           SHA_SHORT=$(git rev-parse --short HEAD)
-          docker build -t $REGISTRY/$IMAGE_NAME:$SHA_SHORT . \
+          docker build -t $REGISTRY/$REPOSITORY:$SHA_SHORT . \
             --build-arg "SECRET_KEY=${{ secrets.SECRET_KEY }}"
-          docker push $REGISTRY/$IMAGE_NAME:$SHA_SHORT
+          docker push $REGISTRY/$REPOSITORY:$SHA_SHORT
+          echo "image=$REGISTRY/$REPOSITORY:$SHA_SHORT" >> $GITHUB_OUTPUT
+
+      - name: Download Task Definition Template
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ secrets.ECS_TASK_DEFINITION }} \
+            --query taskDefinition \
+            > task-definition.json
+          jq 'del(.enableFaultInjection)' task-definition.json > task-definition-fixed.json
+          mv task-definition-fixed.json task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ secrets.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
